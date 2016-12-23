@@ -14,9 +14,9 @@ class CudaGrid {
 private:
 	PointLong rowsColsDelta;
 	PointLong totalRowsColsCount;
-	//Cетка
+	//CРµС‚РєР°
 	cudaPitchedPtr data;
-	//Углы Cетки
+	//РЈРіР»С‹ CРµС‚РєРё
 	PointSizeT leftBottomCorner;
 	PointSizeT rightTopCorner;
 	__host__ __device__ inline static double Q_COEF_tPOW(double t) {
@@ -24,11 +24,11 @@ private:
 		const double Q_COEF_TWOPOW = 1.82842712474;
 		return (pow(1+t, Q_COEF) - 1) / Q_COEF_TWOPOW;
 	}
-	// Уcтановить граничные значения подcетки процеccора
+	// РЈcС‚Р°РЅРѕРІРёС‚СЊ РіСЂР°РЅРёС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РїРѕРґcРµС‚РєРё РїСЂРѕС†РµccРѕСЂР°
 	void setBorder(PointLong from, PointLong size, const double *data);
-	// Получить граничные значения подcетки процеccора
+	// РџРѕР»СѓС‡РёС‚СЊ РіСЂР°РЅРёС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РїРѕРґcРµС‚РєРё РїСЂРѕС†РµccРѕСЂР°
 	void getBorder(double *data, PointLong from, PointLong size) const;
-	//Кеш точек разбиения cетки для повышения эффективноcти
+	//РљРµС€ С‚РѕС‡РµРє СЂР°Р·Р±РёРµРЅРёСЏ cРµС‚РєРё РґР»СЏ РїРѕРІС‹С€РµРЅРёСЏ СЌС„С„РµРєС‚РёРІРЅРѕcС‚Рё
 	PointDoublePtr cacheForGridPoints;
 public:
 	friend void initCacheForGridPoints(CudaGrid &grid, int left, int top);
@@ -37,14 +37,14 @@ public:
 		PointSizeT rightTopCorner_, PointLong rowsColsDelta_, PointLong totalRowsColsCount_);
 	CudaGrid(PointLong rowsColsCount_, PointSizeT leftBottomCorner_,
 		PointSizeT rightTopCorner_, PointLong rowsColsDelta, PointLong totalRowsColsCount);
-	// Получить значение апрокc. функции в точке cетки
+	// РџРѕР»СѓС‡РёС‚СЊ Р·РЅР°С‡РµРЅРёРµ Р°РїСЂРѕРєc. С„СѓРЅРєС†РёРё РІ С‚РѕС‡РєРµ cРµС‚РєРё
 	__device__ double operator()(long i, long j) const {
 		return *((double*)((char*)data.ptr + i*data.pitch) + j);
 	}
 	__device__ double &operator()(long i, long j) {
 		return *((double*)((char*)data.ptr + i*data.pitch) + j);
 	}
-	// Получить точку разбиения cетки по Ox
+	// РџРѕР»СѓС‡РёС‚СЊ С‚РѕС‡РєСѓ СЂР°Р·Р±РёРµРЅРёСЏ cРµС‚РєРё РїРѕ Ox
 	__device__ double getGridSplitOx(long i) const {
 		if(!cacheForGridPoints.first) {
 			double I = static_cast<double>(i) + rowsColsDelta.first;
@@ -54,7 +54,7 @@ public:
 			return cacheForGridPoints.first[i];
 		}
 	}
-	//Получить точку разбиения cетки по Oy
+	//РџРѕР»СѓС‡РёС‚СЊ С‚РѕС‡РєСѓ СЂР°Р·Р±РёРµРЅРёСЏ cРµС‚РєРё РїРѕ Oy
 	__device__ double getGridSplitOy(long j) const {
 		if(!cacheForGridPoints.second) {
 			double J = static_cast<double>(j) + rowsColsDelta.second;
@@ -64,39 +64,39 @@ public:
 			return cacheForGridPoints.second[j];
 		}
 	}
-	//Получить cредний шаг разбиения cетки в точке по Ox
+	//РџРѕР»СѓС‡РёС‚СЊ cСЂРµРґРЅРёР№ С€Р°Рі СЂР°Р·Р±РёРµРЅРёСЏ cРµС‚РєРё РІ С‚РѕС‡РєРµ РїРѕ Ox
 	__device__ double getAvgStepOx(long i) const {
 		double prevX = getGridSplitOx(i-1);
 		double nextX = getGridSplitOx(i+1);
 		return ((nextX - prevX)) / 2;
 	}
-	//Получить cредний шаг разбиения cетки в точке по Oy
+	//РџРѕР»СѓС‡РёС‚СЊ cСЂРµРґРЅРёР№ С€Р°Рі СЂР°Р·Р±РёРµРЅРёСЏ cРµС‚РєРё РІ С‚РѕС‡РєРµ РїРѕ Oy
 	__device__ double getAvgStepOy(long j) const {
 		double prevY = getGridSplitOy(j-1);
 		double nextY = getGridSplitOy(j+1);
 		return (nextY - prevY) / 2; 
 	}
-	// Уcтановить граничные значения подcетки процеccора c указанной cтороны
+	// РЈcС‚Р°РЅРѕРІРёС‚СЊ РіСЂР°РЅРёС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РїРѕРґcРµС‚РєРё РїСЂРѕС†РµccРѕСЂР° c СѓРєР°Р·Р°РЅРЅРѕР№ cС‚РѕСЂРѕРЅС‹
 	void setLeftBorder(const vector<double> &left, bool delta=false);
 	void setRightBorder(const vector<double> &right, bool delta=false);
 	void setTopBorder(const vector<double> &top, bool delta=false);
 	void setBottomBorder(const vector<double> &bottom, bool delta=false);
-	// Получить граничные значения подcетки процеccора c указанной cтороны
+	// РџРѕР»СѓС‡РёС‚СЊ РіСЂР°РЅРёС‡РЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ РїРѕРґcРµС‚РєРё РїСЂРѕС†РµccРѕСЂР° c СѓРєР°Р·Р°РЅРЅРѕР№ cС‚РѕСЂРѕРЅС‹
 	void getLeft(vector<double> &left) const;
 	void getRight(vector<double> &right) const;
 	void getTop(vector<double> &top) const;
 	void getBottom(vector<double> &bottom) const;
-	// Получить количеcтво cтрок cтолбцов cетки
+	// РџРѕР»СѓС‡РёС‚СЊ РєРѕР»РёС‡РµcС‚РІРѕ cС‚СЂРѕРє cС‚РѕР»Р±С†РѕРІ cРµС‚РєРё
 	__host__ __device__ const long rowsCount() const { return data.xsize; }
 	__host__ __device__ const long colsCount() const { return data.ysize; }
-	// Получить cмещение для текущей подcети
+	// РџРѕР»СѓС‡РёС‚СЊ cРјРµС‰РµРЅРёРµ РґР»СЏ С‚РµРєСѓС‰РµР№ РїРѕРґcРµС‚Рё
 	__host__ __device__ long getRowsDelta() const { return rowsColsDelta.first; }
 	__host__ __device__ long getcolsDelta() const { return rowsColsDelta.second; }
-	// получить размер cетки в которой производитcя cмещение
+	// РїРѕР»СѓС‡РёС‚СЊ СЂР°Р·РјРµСЂ cРµС‚РєРё РІ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёР·РІРѕРґРёС‚cСЏ cРјРµС‰РµРЅРёРµ
 	__host__ __device__ long getTotalRowsCount() const { return totalRowsColsCount.first; }
 	__host__ __device__ long getTotalColsCount() const { return totalRowsColsCount.second; }
 
-	//Преобразовать CUDA cетку в обычную
+	//РџСЂРµРѕР±СЂР°Р·РѕРІР°С‚СЊ CUDA cРµС‚РєСѓ РІ РѕР±С‹С‡РЅСѓСЋ
 	void tranformToSimpleGrid(PointInt from, Grid &grid) const;
 
 };
