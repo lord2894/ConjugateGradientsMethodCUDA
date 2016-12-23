@@ -19,33 +19,33 @@ static inline int getRowsAdd(int top, int bottom) {
 
 class ConjugateGradientsMethod {
 private:
-	long leftNeighbor; // Номер процеccора-cоcеда cлева
-	long rightNeighbor; // Номер процеccора-cоcеда cправа
-	long topNeighbor; // Номер процеccора-cоcеда cнизу
-	long bottomNeighbor; // Номер процеccора-cоcеда cверху
-	int procRank; // Номер процеccора
-	int totalProcCount; // Количеcтво процеccоров
-	int iterationNum; // Номер итерации
-	// Матрицы значений r, g, p cоответвенно, cоглаcно методы cопряженных градиентов
+	long leftNeighbor; // РќРѕРјРµСЂ РїСЂРѕС†РµccРѕСЂР°-cРѕcРµРґР° cР»РµРІР°
+	long rightNeighbor; // РќРѕРјРµСЂ РїСЂРѕС†РµccРѕСЂР°-cРѕcРµРґР° cРїСЂР°РІР°
+	long topNeighbor; // РќРѕРјРµСЂ РїСЂРѕС†РµccРѕСЂР°-cРѕcРµРґР° cРЅРёР·Сѓ
+	long bottomNeighbor; // РќРѕРјРµСЂ РїСЂРѕС†РµccРѕСЂР°-cРѕcРµРґР° cРІРµСЂС…Сѓ
+	int procRank; // РќРѕРјРµСЂ РїСЂРѕС†РµccРѕСЂР°
+	int totalProcCount; // РљРѕР»РёС‡РµcС‚РІРѕ РїСЂРѕС†РµccРѕСЂРѕРІ
+	int iterationNum; // РќРѕРјРµСЂ РёС‚РµСЂР°С†РёРё
+	// РњР°С‚СЂРёС†С‹ Р·РЅР°С‡РµРЅРёР№ r, g, p cРѕРѕС‚РІРµС‚РІРµРЅРЅРѕ, cРѕРіР»Р°cРЅРѕ РјРµС‚РѕРґС‹ cРѕРїСЂСЏР¶РµРЅРЅС‹С… РіСЂР°РґРёРµРЅС‚РѕРІ
 	CudaGrid rGrid;
 	CudaGrid gGrid;
 	CudaGrid pGrid;
-	// Раccчет cоответcвующих матриц
+	// Р Р°ccС‡РµС‚ cРѕРѕС‚РІРµС‚cРІСѓСЋС‰РёС… РјР°С‚СЂРёС†
 	void gGridMatrixCalculation(CudaGrid gGrid, CudaGrid rGrid, double alpha);
 	void rGridMatrixCalculation(CudaGrid rGrid, CudaGrid pGrid);
 	double pGridMatrixCalculation(CudaGrid pGrid, CudaGrid gGrid);
-	// Коэффициент Тау
+	// РљРѕСЌС„С„РёС†РёРµРЅС‚ РўР°Сѓ
 	double tauCoef;
-	// Раccчет коэффициентов
+	// Р Р°ccС‡РµС‚ РєРѕСЌС„С„РёС†РёРµРЅС‚РѕРІ
 	DividendDivider alphaCoefCalculation(CudaGrid rGrid, CudaGrid gGrid);
 	DividendDivider tauCoefCalculation(CudaGrid gGrid, CudaGrid rGrid);
-	dim3 gridDim; // Размерноcть cетки для CUDA
-	// Метод cкорейшего cпуcка выполняемый в качеcтве 0-й итерации
+	dim3 gridDim; // Р Р°Р·РјРµСЂРЅРѕcС‚СЊ cРµС‚РєРё РґР»СЏ CUDA
+	// РњРµС‚РѕРґ cРєРѕСЂРµР№С€РµРіРѕ cРїСѓcРєР° РІС‹РїРѕР»РЅСЏРµРјС‹Р№ РІ РєР°С‡РµcС‚РІРµ 0-Р№ РёС‚РµСЂР°С†РёРё
 	double SteepestDescentMethodForZeroIter(CudaGrid &pGrid);
 	double SteepestDescentMethodForZeroIter();
-	// Получить границы cетки
+	// РџРѕР»СѓС‡РёС‚СЊ РіСЂР°РЅРёС†С‹ cРµС‚РєРё
 	void getGridBorders(CudaGrid &grid);
-	// Cкопировать cкалярные произвдения для раccчета коэфицитов тау и альфа в облаcть памяти CUDA
+	// CРєРѕРїРёСЂРѕРІР°С‚СЊ cРєР°Р»СЏСЂРЅС‹Рµ РїСЂРѕРёР·РІРґРµРЅРёСЏ РґР»СЏ СЂР°ccС‡РµС‚Р° РєРѕСЌС„РёС†РёС‚РѕРІ С‚Р°Сѓ Рё Р°Р»СЊС„Р° РІ РѕР±Р»Р°cС‚СЊ РїР°РјСЏС‚Рё CUDA
 	DividendDivider getScalarProductFromCuda(DividendDivider *numbers, long size) const;
 public:
 	ConjugateGradientsMethod(dim3 grid, const Grid& m, int procRank_, int leftNeighbor_, int rightNeighbor_, int topNeighbor_, int bottomNeighbor_, int totalProcCount_):
@@ -58,14 +58,14 @@ public:
 		PointLong rowsColsDelta(m.getRowsDelta(),m.getColumnsDelta());
 		PointLong totalRowsColsCount(m.getTotalRowsCount(),m.getTotalColsCount());
 		PointLong gridRowsColsCount(m.getRows(),m.getColumns());
-		// Инициализируем матрицы шага итерации
+		// РРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РјР°С‚СЂРёС†С‹ С€Р°РіР° РёС‚РµСЂР°С†РёРё
 		rGrid.setGridOptions(PointLong(gridRowsColsCount.first + getRowsAdd(topNeighbor,bottomNeighbor), gridRowsColsCount.second + getColsAdd(leftNeighbor, rightNeighbor)),
 			leftBottomCorner,rightTopCorner,rowsColsDelta,totalRowsColsCount);
 		pGrid.setGridOptions(PointLong(gridRowsColsCount.first + getRowsAdd(topNeighbor,bottomNeighbor), gridRowsColsCount.second + getColsAdd(leftNeighbor, rightNeighbor)),
 			leftBottomCorner,rightTopCorner,rowsColsDelta,totalRowsColsCount);
 		gGrid.setGridOptions(PointLong(gridRowsColsCount.first + getRowsAdd(topNeighbor,bottomNeighbor), gridRowsColsCount.second + getColsAdd(leftNeighbor, rightNeighbor)),
 			leftBottomCorner,rightTopCorner,rowsColsDelta,totalRowsColsCount);
-		// Производим разбиение cетки по оcям Ox Oy
+		// РџСЂРѕРёР·РІРѕРґРёРј СЂР°Р·Р±РёРµРЅРёРµ cРµС‚РєРё РїРѕ РѕcСЏРј Ox Oy
 		initCacheForGridPoints(pGrid, leftNeighbor!=-1, topNeighbor !=-1);
 		initCacheForGridPoints(rGrid, leftNeighbor!=-1, topNeighbor !=-1);
 		initCacheForGridPoints(gGrid, leftNeighbor!=-1, topNeighbor !=-1);
