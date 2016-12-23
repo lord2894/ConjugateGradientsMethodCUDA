@@ -3,13 +3,17 @@
 Построение графиков производится с помощью системы Matlab
 ## Сборка
 module add   impi/5.0.1
+
 module add   intel/15.0.090
+
 module add   cuda/6.5.14
+
 nvcc -ccbin mpicxx CGMProcessor.cpp ConjugateGradientsMethod.cu  GridClass.cpp GridCLassCUDA.cu InputFunctions.cpp Main.cu  XGetopt.cpp -o CGM
 
 
 ## Запуск
 sbatch -p gputest -n 4 impi ./CGM
+
 ### Аргументы
 -x int -- нижний левый угол сетки ось X
 
