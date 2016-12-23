@@ -136,6 +136,6 @@ void CGMProcessor::getResultGrid(string resultGridOutputFname)
 		double elapsed = MPI_Wtime() - startTime;
 		ofstream ofs(resultGridOutputFname.c_str());
 		print(ofs, result);
-		ofs << "stats:" << iterrationCount << '\t' << totalRowsColsCount.first << '\t' << totalRowsColsCount.second << '\t' << elapsed;
+		ofs << "totalTime:" << elapsed << "\t on matrix" << totalRowsColsCount.first << '\t' << totalRowsColsCount.second << '\n';
 	}
 }
