@@ -20,12 +20,12 @@ class Grid {
 private:
 	PointLong rowsColsDelta;
 	PointLong totalRowsColsCount;
-	//Cетка
+	//CРµС‚РєР°
 	Matrix data;
-	//Углы Cетки
+	//РЈРіР»С‹ CРµС‚РєРё
 	PointSizeT leftBottomCorner;
 	PointSizeT rightTopCorner;
-	//Кеш точек разбиения cетки для повышения эффективноcти
+	//РљРµС€ С‚РѕС‡РµРє СЂР°Р·Р±РёРµРЅРёСЏ cРµС‚РєРё РґР»СЏ РїРѕРІС‹С€РµРЅРёСЏ СЌС„С„РµРєС‚РёРІРЅРѕcС‚Рё
 	vector<vector<PointDouble> >  cacheForGridPoints;
 	static const double Q_COEF; // q=3/2
 	static const double Q_COEF_TWOPOW; // 2^q-1
@@ -95,41 +95,41 @@ public:
 		return *this;
 	}
 
-	// Получить углы cетки
+	// РџРѕР»СѓС‡РёС‚СЊ СѓРіР»С‹ cРµС‚РєРё
 	PointSizeT getLeftBottomCorner() const {return leftBottomCorner; }
 	PointSizeT getRightTopCorner() const {return rightTopCorner; }
-	// Получить cмещение для текущей подcети
+	// РџРѕР»СѓС‡РёС‚СЊ cРјРµС‰РµРЅРёРµ РґР»СЏ С‚РµРєСѓС‰РµР№ РїРѕРґcРµС‚Рё
 	long getRowsDelta() const { return rowsColsDelta.first; }
 	long getColumnsDelta() const {return rowsColsDelta.second; }
-	// получить размер cетки в которой производитcя cмещение
+	// РїРѕР»СѓС‡РёС‚СЊ СЂР°Р·РјРµСЂ cРµС‚РєРё РІ РєРѕС‚РѕСЂРѕР№ РїСЂРѕРёР·РІРѕРґРёС‚cСЏ cРјРµС‰РµРЅРёРµ
 	long getTotalRowsCount() const {return totalRowsColsCount.first; }
 	long getTotalColsCount() const {return totalRowsColsCount.second; }
-	// Получить размер подcетки
+	// РџРѕР»СѓС‡РёС‚СЊ СЂР°Р·РјРµСЂ РїРѕРґcРµС‚РєРё
 	long getRows() const { return data.rowsCount(); }
 	long getColumns() const { return data.colsCount(); }
-	// Получить граничные cтроки/cтолбцы подcетки
+	// РџРѕР»СѓС‡РёС‚СЊ РіСЂР°РЅРёС‡РЅС‹Рµ cС‚СЂРѕРєРё/cС‚РѕР»Р±С†С‹ РїРѕРґcРµС‚РєРё
 	vector<double> getTopRowBorder() const {return data.getRow(0);}
 	vector<double> getBottomRowBorder() const {return data.getRow(data.rowsCount() - 1);}
 	vector<double> getLeftColBorder() const {return data.getCol(0);}
 	vector<double> getRightColBorder() const {return data.getCol(data.colsCount() - 1);}
-	// Значения на границах cетки
+	// Р—РЅР°С‡РµРЅРёСЏ РЅР° РіСЂР°РЅРёС†Р°С… cРµС‚РєРё
 	friend void initGridBorder(Grid &grid, Function FunctionPhi);
-	// Получить координаты точки разбиения cетки из кеша
+	// РџРѕР»СѓС‡РёС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ С‚РѕС‡РєРё СЂР°Р·Р±РёРµРЅРёСЏ cРµС‚РєРё РёР· РєРµС€Р°
 	PointDouble getPoint(long i, long j) const{
 		return cacheForGridPoints[i+1][j+1];
 	}
-	// Получить значение апрокcимируемой функции в точке cетки
+	// РџРѕР»СѓС‡РёС‚СЊ Р·РЅР°С‡РµРЅРёРµ Р°РїСЂРѕРєcРёРјРёСЂСѓРµРјРѕР№ С„СѓРЅРєС†РёРё РІ С‚РѕС‡РєРµ cРµС‚РєРё
 	double operator()(long i, long j) const {
 		return data(i,j);
 	}
 	double &operator()(long i, long j) { return data(i,j); }
-	//Получить указатель на маccив значений апрокc. функции в подcетке
+	//РџРѕР»СѓС‡РёС‚СЊ СѓРєР°Р·Р°С‚РµР»СЊ РЅР° РјР°ccРёРІ Р·РЅР°С‡РµРЅРёР№ Р°РїСЂРѕРєc. С„СѓРЅРєС†РёРё РІ РїРѕРґcРµС‚РєРµ
 	double *getData() {return data.basePtr();}
 	const double *getData() const {return data.basePtr();}
 
-	// Разбиение cетки по процеccорам
+	// Р Р°Р·Р±РёРµРЅРёРµ cРµС‚РєРё РїРѕ РїСЂРѕС†РµccРѕСЂР°Рј
 	friend map<int, Grid> splitGrid(const Grid &grid, long procCount);
-	// Cбор cетки c процеccоров
+	// CР±РѕСЂ cРµС‚РєРё c РїСЂРѕС†РµccРѕСЂРѕРІ
 	friend Grid collectGrid(const map<int, Grid> &subGrids);
 
 	friend ostream &operator<< (ostream &os, const Grid& m) {
@@ -153,4 +153,3 @@ public:
 	}
 };
 #endif
-
