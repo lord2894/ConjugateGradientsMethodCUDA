@@ -9,8 +9,6 @@ const dim3 BLOCK_DIM(BLOCK_SIZE_X, BLOCK_SIZE_Y);
 __device__ double CUDAFunctionF(double x, double y){
 	return 2*(x*x + y*y)*(1 - 2*x*x*y*y)*exp(1 - x*x*y*y);
 }
-
-
 __device__ double fiveDotScheme(CudaGrid m, long i,long j) {
 	double prevX = m.getGridSplitOx(i-1);
 	double prevY = m.getGridSplitOy(j-1);
@@ -94,7 +92,7 @@ void ConjugateGradientsMethod::getGridBorders(CudaGrid &grid) {
 }
 
 
-// Ядро cбора значений cкалярных произвдений
+// РЇРґСЂРѕ cР±РѕСЂР° Р·РЅР°С‡РµРЅРёР№ cРєР°Р»СЏСЂРЅС‹С… РїСЂРѕРёР·РІРґРµРЅРёР№
 template <unsigned int blockSize>
 __device__ void CUDA_Allreduce(DividendDivider*sData, DividendDivider *global, long tid, double nom, double denom) {
 	sData[tid].first = nom;
@@ -159,7 +157,7 @@ __device__ void CUDA_Allreduce(DividendDivider*sData, DividendDivider *global, l
 		global[blockIndex].second = sData[0].second;
 	}
 }
-// Ядра вычиcления матриц
+// РЇРґСЂР° РІС‹С‡РёcР»РµРЅРёСЏ РјР°С‚СЂРёС†
 __global__ void rGridCalculationKernel(CudaGrid rGrid, CudaGrid pGrid) {
 	long i = blockDim.x*blockIdx.x + threadIdx.x + 1;
 	long j = blockDim.y*blockIdx.y + threadIdx.y + 1;
@@ -207,7 +205,7 @@ double ConjugateGradientsMethod::pGridMatrixCalculation(CudaGrid pGrid, CudaGrid
 	return getScalarProductFromCuda(fractions, gridDim.x*gridDim.y).first;
 }
 
-// Раccчет коэфициентов тау и альфа
+// Р Р°ccС‡РµС‚ РєРѕСЌС„РёС†РёРµРЅС‚РѕРІ С‚Р°Сѓ Рё Р°Р»СЊС„Р°
 __global__ void kernelCalcTau(CudaGrid gGrid, CudaGrid rGrid, DividendDivider *tauCoefs) {
 	extern __shared__ DividendDivider shared[];
 	long i = blockDim.x*blockIdx.x + threadIdx.x + 1;
@@ -251,7 +249,7 @@ DividendDivider ConjugateGradientsMethod::alphaCoefCalculation(CudaGrid rGrid, C
 	kernelCalcAlpha<<<gridDim, BLOCK_DIM, BLOCK_SIZE*sizeof(DividendDivider)>>>(rGrid, gGrid, fractions);
 	return getScalarProductFromCuda(fractions, gridDim.x*gridDim.y);
 }
-// Получить результаты cкалярных умножений c куда
+// РџРѕР»СѓС‡РёС‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚С‹ cРєР°Р»СЏСЂРЅС‹С… СѓРјРЅРѕР¶РµРЅРёР№ c РєСѓРґР°
 DividendDivider ConjugateGradientsMethod::getScalarProductFromCuda(DividendDivider *numbers, long totalProcCount) const {
 	vector<DividendDivider> localData;
 	localData.resize(totalProcCount);
@@ -268,7 +266,7 @@ DividendDivider ConjugateGradientsMethod::getScalarProductFromCuda(DividendDivid
 	return result;
 }
 
-// Итерация Метода cопряженных градиентов
+// РС‚РµСЂР°С†РёСЏ РњРµС‚РѕРґР° cРѕРїСЂСЏР¶РµРЅРЅС‹С… РіСЂР°РґРёРµРЅС‚РѕРІ
 double ConjugateGradientsMethod::CGMIteration() {
 	double error;
 	if(iterationNum == 0) {
