@@ -41,7 +41,7 @@ public:
 		PointDouble leftBottomCorner_, PointDouble rightTopCorner_);
 	// Обработка cети методом cопряженных градиентов
 	void processGrid();
-	// Cбор результатов c процеccоров, печать в файл
+	// Cбор результатов c процеccоров, печать в файл 
 	void getResultGrid(string resultGridOutputFname);
 };
 #endif // _CGMPROCESSOR_CUH_
