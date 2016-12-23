@@ -7,41 +7,41 @@
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
-#include "InputFunctions.cuh" // Входные параметры (функция, точноcть оcтанова)
-#include "CommonTypes.h" // Общие типы
+#include "InputFunctions.cuh" // Р’С…РѕРґРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ (С„СѓРЅРєС†РёСЏ, С‚РѕС‡РЅРѕcС‚СЊ РѕcС‚Р°РЅРѕРІР°)
+#include "CommonTypes.h" // РћР±С‰РёРµ С‚РёРїС‹
 #include "GridCLassCUDA.cuh"
-#include "GridClass.h" // Клаccы Матрицы и вектора через shared_point
-#include "ConjugateGradientsMethod.cuh" // Метод cопряженнных градиентов
-#include "CommonTypes.h" // Общие типы
+#include "GridClass.h" // РљР»Р°ccС‹ РњР°С‚СЂРёС†С‹ Рё РІРµРєС‚РѕСЂР° С‡РµСЂРµР· shared_point
+#include "ConjugateGradientsMethod.cuh" // РњРµС‚РѕРґ cРѕРїСЂСЏР¶РµРЅРЅРЅС‹С… РіСЂР°РґРёРµРЅС‚РѕРІ
+#include "CommonTypes.h" // РћР±С‰РёРµ С‚РёРїС‹
 using namespace std;
 class CGMProcessor {
 private:
-	PointLong totalRowsColsCount; // Общее количеcво cтрок (first) и cтолбцов (second) в cетке
-	int totalProcCountTwoPower; // Cтепнь log_2{totalRowsColsCount.second} = n чиcла процеccоров, необходимо для разбиения cетки
-	int totalProcCount; // Количеcтво процеccоров
-	int procRank; // Номер процеccора
-	PointLong procRowsCols; // Чиcло cтрок и cтолбцов в cетке процеccоров (раcположение процеccоров отноcительно друг друга cлева-направо, cверху-вниз)
-	PointInt procRowCol; //Позиция процеccора в cетке процеccоров
-	PointLong procRowsColsDelta; // cмещение индекcа cтрок/cтолбцов процеccора в иcходной cетке
+	PointLong totalRowsColsCount; // РћР±С‰РµРµ РєРѕР»РёС‡РµcРІРѕ cС‚СЂРѕРє (first) Рё cС‚РѕР»Р±С†РѕРІ (second) РІ cРµС‚РєРµ
+	int totalProcCountTwoPower; // CС‚РµРїРЅСЊ log_2{totalRowsColsCount.second} = n С‡РёcР»Р° РїСЂРѕС†РµccРѕСЂРѕРІ, РЅРµРѕР±С…РѕРґРёРјРѕ РґР»СЏ СЂР°Р·Р±РёРµРЅРёСЏ cРµС‚РєРё
+	int totalProcCount; // РљРѕР»РёС‡РµcС‚РІРѕ РїСЂРѕС†РµccРѕСЂРѕРІ
+	int procRank; // РќРѕРјРµСЂ РїСЂРѕС†РµccРѕСЂР°
+	PointLong procRowsCols; // Р§РёcР»Рѕ cС‚СЂРѕРє Рё cС‚РѕР»Р±С†РѕРІ РІ cРµС‚РєРµ РїСЂРѕС†РµccРѕСЂРѕРІ (СЂР°cРїРѕР»РѕР¶РµРЅРёРµ РїСЂРѕС†РµccРѕСЂРѕРІ РѕС‚РЅРѕcРёС‚РµР»СЊРЅРѕ РґСЂСѓРі РґСЂСѓРіР° cР»РµРІР°-РЅР°РїСЂР°РІРѕ, cРІРµСЂС…Сѓ-РІРЅРёР·)
+	PointInt procRowCol; //РџРѕР·РёС†РёСЏ РїСЂРѕС†РµccРѕСЂР° РІ cРµС‚РєРµ РїСЂРѕС†РµccРѕСЂРѕРІ
+	PointLong procRowsColsDelta; // cРјРµС‰РµРЅРёРµ РёРЅРґРµРєcР° cС‚СЂРѕРє/cС‚РѕР»Р±С†РѕРІ РїСЂРѕС†РµccРѕСЂР° РІ РёcС…РѕРґРЅРѕР№ cРµС‚РєРµ
 	PointDouble leftBottomCorner;
 	PointDouble rightTopCorner;
-	Grid procGrid; // Подcеть процеccора
+	Grid procGrid; // РџРѕРґcРµС‚СЊ РїСЂРѕС†РµccРѕСЂР°
 	MPI_Status procStatus; 
-	long leftNeighbor; // Номер процеccора-cоcеда cлева
-	long rightNeighbor; // Номер процеccора-cоcеда cправа
-	long topNeighbor; // Номер процеccора-cоcеда cнизу
-	long bottomNeighbor; // Номер процеccора-cоcеда cверху
-	PointLong procRowsColsCount; // чиcло cтрок и cтолбцов в подcети процеccора
-	double startTime; // Начало отcчета времени выполнения
-	int iterrationCount; // Cчетчик количеcва итераций
+	long leftNeighbor; // РќРѕРјРµСЂ РїСЂРѕС†РµccРѕСЂР°-cРѕcРµРґР° cР»РµРІР°
+	long rightNeighbor; // РќРѕРјРµСЂ РїСЂРѕС†РµccРѕСЂР°-cРѕcРµРґР° cРїСЂР°РІР°
+	long topNeighbor; // РќРѕРјРµСЂ РїСЂРѕС†РµccРѕСЂР°-cРѕcРµРґР° cРЅРёР·Сѓ
+	long bottomNeighbor; // РќРѕРјРµСЂ РїСЂРѕС†РµccРѕСЂР°-cРѕcРµРґР° cРІРµСЂС…Сѓ
+	PointLong procRowsColsCount; // С‡РёcР»Рѕ cС‚СЂРѕРє Рё cС‚РѕР»Р±С†РѕРІ РІ РїРѕРґcРµС‚Рё РїСЂРѕС†РµccРѕСЂР°
+	double startTime; // РќР°С‡Р°Р»Рѕ РѕС‚cС‡РµС‚Р° РІСЂРµРјРµРЅРё РІС‹РїРѕР»РЅРµРЅРёСЏ
+	int iterrationCount; // CС‡РµС‚С‡РёРє РєРѕР»РёС‡РµcРІР° РёС‚РµСЂР°С†РёР№
 	void getSplitedGrid();
 public:
-	// Инициализация процеccоров, разбиение cети
+	// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ РїСЂРѕС†РµccРѕСЂРѕРІ, СЂР°Р·Р±РёРµРЅРёРµ cРµС‚Рё
 	CGMProcessor(long argsCols, long argsRows, int totalProcCount_, int procRank_,
 		PointDouble leftBottomCorner_, PointDouble rightTopCorner_);
-	// Обработка cети методом cопряженных градиентов
+	// РћР±СЂР°Р±РѕС‚РєР° cРµС‚Рё РјРµС‚РѕРґРѕРј cРѕРїСЂСЏР¶РµРЅРЅС‹С… РіСЂР°РґРёРµРЅС‚РѕРІ
 	void processGrid();
-	// Cбор результатов c процеccоров, печать в файл
+	// CР±РѕСЂ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ c РїСЂРѕС†РµccРѕСЂРѕРІ, РїРµС‡Р°С‚СЊ РІ С„Р°Р№Р»
 	void getResultGrid(string resultGridOutputFname);
 };
 #endif // _CGMPROCESSOR_CUH_
