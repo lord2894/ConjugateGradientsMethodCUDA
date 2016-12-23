@@ -102,7 +102,7 @@ void CGMProcessor::processGrid() {
 	while (err > EPSILON) {
 		err = iter.CGMIteration();
 		if (procRank == 0) {
-			cout << "Iteration: " << iterrationCount++ << " Error: " << err << "\n";
+			cout << "I: " << iterrationCount++ << " E: " << err << "\n";
 		}
 	}
 	iter.getPGrid(procGrid);
