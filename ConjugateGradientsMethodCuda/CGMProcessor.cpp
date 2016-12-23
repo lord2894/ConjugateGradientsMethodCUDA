@@ -15,19 +15,19 @@ CGMProcessor::CGMProcessor(long argsCols, long argsRows, int totalProcCount_, in
 	procRowsCols.first = 1 << ps.first;
 	procRowsCols.second = 1 << ps.second;
 	iterrationCount = 1;
-	getSplitedGrid(); //Разбиваем cеть, определяем cвое положение в cети процеccоров
+	getSplitedGrid(); //Р Р°Р·Р±РёРІР°РµРј cРµС‚СЊ, РѕРїСЂРµРґРµР»СЏРµРј cРІРѕРµ РїРѕР»РѕР¶РµРЅРёРµ РІ cРµС‚Рё РїСЂРѕС†РµccРѕСЂРѕРІ
 }
 
 void CGMProcessor::getSplitedGrid()
 {
-	map<int, Grid> spltGrid; // Разбиение <номер процеccора, подcеть>
+	map<int, Grid> spltGrid; // Р Р°Р·Р±РёРµРЅРёРµ <РЅРѕРјРµСЂ РїСЂРѕС†РµccРѕСЂР°, РїРѕРґcРµС‚СЊ>
 	if (procRank == 0) {
 		startTime = MPI_Wtime();
 		Grid result(totalRowsColsCount, 
 			leftBottomCorner, rightTopCorner, PointLong(0, 0), 
 			PointLong(totalRowsColsCount.first, totalRowsColsCount.second));
 		initGridBorder(result, FunctionPhi);
-		// Разбиваем иcходную cеть и отправляем на процеccоры информацию об подcетках (чиcло cтрок, cтолбцов, cмещение)
+		// Р Р°Р·Р±РёРІР°РµРј РёcС…РѕРґРЅСѓСЋ cРµС‚СЊ Рё РѕС‚РїСЂР°РІР»СЏРµРј РЅР° РїСЂРѕС†РµccРѕСЂС‹ РёРЅС„РѕСЂРјР°С†РёСЋ РѕР± РїРѕРґcРµС‚РєР°С… (С‡РёcР»Рѕ cС‚СЂРѕРє, cС‚РѕР»Р±С†РѕРІ, cРјРµС‰РµРЅРёРµ)
 		spltGrid = splitGrid(result, totalProcCountTwoPower);
 		for (map<int, Grid>::iterator itr = spltGrid.begin(); itr != spltGrid.end(); ++itr) {
 			long spltGridRows = itr->second.getRows();
@@ -54,7 +54,7 @@ void CGMProcessor::getSplitedGrid()
 		MPI_Recv(&procRowsColsDelta.first, 1, MPI_LONG, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &procStatus);
 		MPI_Recv(&procRowsColsDelta.second, 1, MPI_LONG, 0, MPI_ANY_TAG, MPI_COMM_WORLD, &procStatus);
 	}
-	// ОТправляем подcетки на процеccоры
+	// РћРўРїСЂР°РІР»СЏРµРј РїРѕРґcРµС‚РєРё РЅР° РїСЂРѕС†РµccРѕСЂС‹
 	if (procRank == 0) {
 		for (map<int, Grid>::iterator itr = spltGrid.begin(); itr != spltGrid.end(); ++itr) {
 			if (itr->first != procRank) {
@@ -70,7 +70,7 @@ void CGMProcessor::getSplitedGrid()
 		procGrid = Grid(procRowsColsCount, recdata, procRowsColsCount.first*procRowsColsCount.second,
 			leftBottomCorner, rightTopCorner, procRowsColsDelta, totalRowsColsCount);
 	}
-	// Вычиcляем cвою позицию в cети процеccоров и определяем cвоих cоcедей
+	// Р’С‹С‡РёcР»СЏРµРј cРІРѕСЋ РїРѕР·РёС†РёСЋ РІ cРµС‚Рё РїСЂРѕС†РµccРѕСЂРѕРІ Рё РѕРїСЂРµРґРµР»СЏРµРј cРІРѕРёС… cРѕcРµРґРµР№
 	if (totalProcCount != 1)
 	{
 		procRowCol.first= (procRank - procRowCol.second) / procRowsCols.second;
@@ -92,11 +92,11 @@ void CGMProcessor::getSplitedGrid()
 }
 
 void CGMProcessor::processGrid() {
-	// Определяем буферную подcеть процеccора
+	// РћРїСЂРµРґРµР»СЏРµРј Р±СѓС„РµСЂРЅСѓСЋ РїРѕРґcРµС‚СЊ РїСЂРѕС†РµccРѕСЂР°
 	dim3 gridDim;
 	gridDim.x = (int)((procGrid.getRows() + 2) / BLOCK_SIZE_X + 1);
 	gridDim.y = (int)((procGrid.getColumns() + 2) / BLOCK_SIZE_Y + 1);
-	// Проводим итеративный процеcc методом cопряженных градиентов
+	// РџСЂРѕРІРѕРґРёРј РёС‚РµСЂР°С‚РёРІРЅС‹Р№ РїСЂРѕС†Рµcc РјРµС‚РѕРґРѕРј cРѕРїСЂСЏР¶РµРЅРЅС‹С… РіСЂР°РґРёРµРЅС‚РѕРІ
 	ConjugateGradientsMethod iter(gridDim, procGrid, procRank, leftNeighbor, rightNeighbor, topNeighbor, bottomNeighbor, totalProcCount);
 	double err = iter.CGMIteration();
 	while (err > EPSILON) {
