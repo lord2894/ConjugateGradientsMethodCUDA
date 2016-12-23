@@ -1,4 +1,4 @@
-#include "InputFunctions.cuh"
+#include "InputFunctions.h"
 using namespace std;
 
 double FunctionF(PointDouble p) {

@@ -2,7 +2,7 @@
 #define _KERNELS_CUH_
 #include "GridCLassCUDA.cuh"
 #include "GridClass.h"
-#include "InputFunctions.cuh"
+#include "InputFunctions.h"
 #include <mpi.h>
 typedef PointDouble DividendDivider;
 extern const long BLOCK_SIZE_X;

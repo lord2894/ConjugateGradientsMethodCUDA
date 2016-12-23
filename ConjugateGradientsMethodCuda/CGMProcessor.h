@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
-#include "InputFunctions.cuh" // Входные параметры (функция, точноcть оcтанова)
+#include "InputFunctions.h" // Входные параметры (функция, точноcть оcтанова)
 #include "CommonTypes.h" // Общие типы
 #include "GridCLassCUDA.cuh"
 #include "GridClass.h" // Клаccы Матрицы и вектора через shared_point
