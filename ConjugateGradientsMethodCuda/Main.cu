@@ -5,7 +5,7 @@ using namespace std;
 int main(int argc, char **argv) {
     int totalprocCount, rank;
 	//Args args = ParseArgsStr(argc, argv);
-	//Теcтовый набор параметров--------
+	//РўРµcС‚РѕРІС‹Р№ РЅР°Р±РѕСЂ РїР°СЂР°РјРµС‚СЂРѕРІ--------
 	Args args;
 	args.leftBottomCornerX = 0;
 	args.leftBottomCornerY = 0;
