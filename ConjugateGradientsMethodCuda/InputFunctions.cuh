@@ -6,7 +6,7 @@
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 #include "CommonTypes.h"
-#include "XGetopt.h" // Парcинг параметров командной cтроки
+#include "XGetopt.h" // РџР°СЂcРёРЅРі РїР°СЂР°РјРµС‚СЂРѕРІ РєРѕРјР°РЅРґРЅРѕР№ cС‚СЂРѕРєРё
 
 struct Args {
 	long leftBottomCornerX;
