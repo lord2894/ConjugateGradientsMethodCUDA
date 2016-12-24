@@ -47,5 +47,3 @@ sbatch -p gputest -n 8 --ntasks-per-node=1  impi  ./CGM
 
 ####На данный момент в Main.cu заданы тестовые значения, поэтому аргументы командной строки не требуются
 
-### На СК Ломоносов
-sbatch -p gputest -n 4 impi ./CGM
