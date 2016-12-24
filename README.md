@@ -2,6 +2,8 @@
 ## Построение графиков
 Построение графиков производится с помощью системы Matlab
 ## Сборка
+module add openmpi/1.8.4-icc
+
 module add   impi/5.0.1
 
 module add   intel/15.0.090
@@ -10,9 +12,21 @@ module add   cuda/6.5.14
 
 nvcc -ccbin mpicxx CGMProcessor.cpp ConjugateGradientsMethod.cu  GridClass.cpp GridCLassCUDA.cu InputFunctions.cpp Main.cu  XGetopt.cpp -o CGM
 
+или 
+
+module add   cuda/6.5.14
+
+module add openmpi/1.8.4-gcc
+
+nvcc -ccbin mpicxx CGMProcessor.cpp ConjugateGradientsMethod.cu  GridClass.cpp GridCLassCUDA.cu InputFunctions.cpp Main.cu  XGetopt.cpp -o CGM
+
 
 ## Запуск
-sbatch -p gputest -n 4 impi ./CGM
+sbatch -p gputest -n 8 --ntasks-per-node=1  ompi  ./CGM
+
+или
+
+sbatch -p gputest -n 8 --ntasks-per-node=1  impi  ./CGM
 
 ### Аргументы
 -x int -- нижний левый угол сетки ось X
